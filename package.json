@@ -1,13 +1,13 @@
 {
   "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.10",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/typeorm": "^10.0.0",
-    "@nestjs/mapped-types": "*",
-    "@grpc/grpc-js": "^1.9.0",
-    "@grpc/proto-loader": "^0.7.10"
+    "@nestjs/typeorm": "^10.0.0"
   },
   "name": "gol",
   "version": "1.0.0",
@@ -34,5 +34,8 @@
     "migration:generate": "npm run typeorm -- migration:generate -n",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert"
+  },
+  "devDependencies": {
+    "ts-proto": "^2.11.2"
   }
 }
