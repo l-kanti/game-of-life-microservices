@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { BoardComputeServiceService } from './board-compute-service.service';
-import { BoardComputeServiceController } from './board-compute-service.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BoardComputeController } from './board-compute-service.controller';
+import { BoardComputeService } from './board-compute-service.service';
+import { GameOfLifeService } from './game-of-life.service';
+import { Board } from './board.entity';
 
 @Module({
-  controllers: [BoardComputeServiceController],
-  providers: [BoardComputeServiceService],
+  imports: [TypeOrmModule.forFeature([Board])],
+  controllers: [BoardComputeController],
+  providers: [BoardComputeService, GameOfLifeService],
 })
-export class BoardComputeServiceModule {}
+export class BoardComputeModule {}

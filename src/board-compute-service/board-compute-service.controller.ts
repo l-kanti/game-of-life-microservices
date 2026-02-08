@@ -1,35 +1,64 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
-import { BoardComputeServiceService } from './board-compute-service.service';
-import { CreateBoardComputeServiceDto } from './dto/create-board-compute-service.dto';
-import { UpdateBoardComputeServiceDto } from './dto/update-board-compute-service.dto';
+import { GrpcMethod } from '@nestjs/microservices';
+import { BoardComputeService } from './board-compute-service.service';
+
+interface BoardGrid {
+  rows: Array<{ cells: boolean[] }>;
+}
+
+interface GetBoardsRequest {
+  game_id: number;
+  num_ticks: number;
+  last_tick: number;
+}
+
+interface GetBoardsResponse {
+  game_id: number;
+  last_tick: number;
+  boards: BoardGrid[];
+}
+
+interface GetBoardsReplayRequest {
+  game_id: number;
+}
+
+interface GetBoardsReplayResponse {
+  boards: BoardGrid[];
+}
+
+interface CreateBoardRequest {
+  board: BoardGrid;
+}
+
+interface CreateBoardResponse {
+  game_id: number;
+  last_tick: number;
+  boards: BoardGrid[];
+}
 
 @Controller()
-export class BoardComputeServiceController {
-  constructor(private readonly boardComputeServiceService: BoardComputeServiceService) {}
+export class BoardComputeController {
+  constructor(private readonly boardComputeService: BoardComputeService) {}
 
-  @MessagePattern('createBoardComputeService')
-  create(@Payload() createBoardComputeServiceDto: CreateBoardComputeServiceDto) {
-    return this.boardComputeServiceService.create(createBoardComputeServiceDto);
+  @GrpcMethod('BoardRequestService', 'GetBoards')
+  async getBoards(data: GetBoardsRequest): Promise<GetBoardsResponse> {
+    return await this.boardComputeService.getBoards(
+      data.game_id,
+      data.num_ticks,
+      data.last_tick,
+    );
   }
 
-  @MessagePattern('findAllBoardComputeService')
-  findAll() {
-    return this.boardComputeServiceService.findAll();
+  @GrpcMethod('BoardRequestService', 'GetBoardsReplay')
+  async getBoardsReplay(
+    data: GetBoardsReplayRequest,
+  ): Promise<GetBoardsReplayResponse> {
+    return await this.boardComputeService.getBoardsReplay(data.game_id);
   }
 
-  @MessagePattern('findOneBoardComputeService')
-  findOne(@Payload() id: number) {
-    return this.boardComputeServiceService.findOne(id);
-  }
-
-  @MessagePattern('updateBoardComputeService')
-  update(@Payload() updateBoardComputeServiceDto: UpdateBoardComputeServiceDto) {
-    return this.boardComputeServiceService.update(updateBoardComputeServiceDto.id, updateBoardComputeServiceDto);
-  }
-
-  @MessagePattern('removeBoardComputeService')
-  remove(@Payload() id: number) {
-    return this.boardComputeServiceService.remove(id);
+  @GrpcMethod('BoardRequestService', 'CreateBoard')
+  async createBoard(data: CreateBoardRequest): Promise<CreateBoardResponse> {
+    const board = data.board.rows.map((row) => row.cells);
+    return await this.boardComputeService.createBoard(board);
   }
 }

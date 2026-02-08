@@ -1,9 +1,24 @@
 import { Module } from '@nestjs/common';
-import { BoardRequestServiceService } from './board-request-service.service';
-import { BoardRequestServiceController } from './board-request-service.controller';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { join } from 'path';
+import { BoardRequestController } from './board-request-service.controller';
+import { BoardRequestService } from './board-request-service.service';
 
 @Module({
-  controllers: [BoardRequestServiceController],
-  providers: [BoardRequestServiceService],
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'BOARD_COMPUTE_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'board',
+          protoPath: join(__dirname, '../proto/board_request_service.proto'),
+          url: 'localhost:5000', // Adjust to your gRPC server URL
+        },
+      },
+    ]),
+  ],
+  controllers: [BoardRequestController],
+  providers: [BoardRequestService],
 })
-export class BoardRequestServiceModule {}
+export class BoardRequestModule {}
