@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "picture" DROP NOT NULL,
-ALTER COLUMN "picture" SET DATA TYPE TEXT;
