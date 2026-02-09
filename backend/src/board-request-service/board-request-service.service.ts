@@ -1,44 +1,28 @@
 import { Injectable, HttpException, HttpStatus, Inject, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { BoardsResponseDto, ReplayResponseDto } from './board.dto';
-
-interface BoardGrid {
-  rows: Array<{ cells: boolean[] }>;
-}
-
-interface BoardRequestServiceGrpc {
-  getBoards(data: {
-    game_id: number;
-    num_ticks: number;
-    last_tick: number;
-  }): Promise<{
-    game_id: number;
-    last_tick: number;
-    boards: BoardGrid[];
-  }>;
-
-  getBoardsReplay(data: { game_id: number }): Promise<{
-    boards: BoardGrid[];
-  }>;
-
-  createBoard(data: { board: BoardGrid }): Promise<{
-    game_id: number;
-    last_tick: number;
-    boards: BoardGrid[];
-  }>;
-}
+import { BoardsResponseDto, ReplayResponseDto } from './dto/board.dto';
+import {
+  BoardRequestServiceClient,
+  GetBoardsRequest,
+  GetBoardsResponse,
+  GetBoardsReplayRequest,
+  GetBoardsReplayResponse,
+  CreateBoardRequest,
+  CreateBoardResponse,
+  BoardGrid,
+} from '../generated/board'; 
 
 @Injectable()
 export class BoardRequestService implements OnModuleInit {
-  private boardComputeService: BoardRequestServiceGrpc;
+  private boardComputeService: BoardRequestServiceClient; // ✅ Use generated interface
 
   constructor(
-    @Inject('BOARD_COMPUTE_PACKAGE') private client: ClientGrpc,
+    @Inject('BOARD_PACKAGE') private client: ClientGrpc, // ✅ Fixed: Match module name
   ) {}
 
   onModuleInit() {
-    this.boardComputeService = this.client.getService<BoardRequestServiceGrpc>(
+    this.boardComputeService = this.client.getService<BoardRequestServiceClient>(
       'BoardRequestService',
     );
   }
@@ -46,13 +30,14 @@ export class BoardRequestService implements OnModuleInit {
   async createBoard(board: boolean[][]): Promise<BoardsResponseDto> {
     try {
       const boardGrid = this.convertToProtoGrid(board);
-      const response = await firstValueFrom(
-        this.boardComputeService.createBoard({ board: boardGrid }),
+      const request: CreateBoardRequest = { board: boardGrid };
+      const response: CreateBoardResponse = await firstValueFrom(
+        this.boardComputeService.createBoard(request),
       );
 
       return {
-        gameId: response.game_id,
-        lastTick: response.last_tick,
+        gameId: response.gameId,
+        lastTick: response.lastTick,
         boards: this.convertProtoGridsToArrays(response.boards),
       };
     } catch (error) {
@@ -69,17 +54,20 @@ export class BoardRequestService implements OnModuleInit {
     lastTick: number,
   ): Promise<BoardsResponseDto> {
     try {
-      const response = await firstValueFrom(
-        this.boardComputeService.getBoards({
-          game_id: gameId,
-          num_ticks: ticks,
-          last_tick: lastTick,
-        }),
+      // ✅ Use generated request/response types
+      const request: GetBoardsRequest = {
+        gameId: gameId,
+        numTicks: ticks,
+        lastTick: lastTick,
+      };
+      
+      const response: GetBoardsResponse = await firstValueFrom(
+        this.boardComputeService.getBoards(request),
       );
 
       return {
-        gameId: response.game_id,
-        lastTick: response.last_tick,
+        gameId: response.gameId,
+        lastTick: response.lastTick,
         boards: this.convertProtoGridsToArrays(response.boards),
       };
     } catch (error) {
@@ -92,8 +80,10 @@ export class BoardRequestService implements OnModuleInit {
 
   async getReplay(gameId: number): Promise<ReplayResponseDto> {
     try {
-      const response = await firstValueFrom(
-        this.boardComputeService.getBoardsReplay({ game_id: gameId }),
+      const request: GetBoardsReplayRequest = { gameId: gameId };
+      
+      const response: GetBoardsReplayResponse = await firstValueFrom(
+        this.boardComputeService.getBoardsReplay(request),
       );
 
       return {

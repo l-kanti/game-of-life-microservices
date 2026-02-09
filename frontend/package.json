@@ -1,0 +1,8 @@
+{
+    "name": "frontend",
+    "version": "1.0.0",
+    "scripts": {
+      "start": "echo 'Frontend not implemented yet'",
+      "build": "mkdir -p build && echo 'placeholder' > build/index.html"
+    }
+  }

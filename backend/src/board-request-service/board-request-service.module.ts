@@ -8,12 +8,12 @@ import { BoardRequestService } from './board-request-service.service';
   imports: [
     ClientsModule.register([
       {
-        name: 'BOARD_COMPUTE_PACKAGE',
+        name: 'BOARD_PACKAGE',
         transport: Transport.GRPC,
         options: {
           package: 'board',
-          protoPath: join(__dirname, '../proto/board_request_service.proto'),
-          url: 'localhost:5000', // Adjust to your gRPC server URL
+          protoPath: join(__dirname, '../proto/board.proto'),
+          url: 'localhost:5000',
         },
       },
     ]),

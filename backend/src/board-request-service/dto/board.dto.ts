@@ -1,5 +1,4 @@
-import { IsNumber, IsArray, IsNotEmpty, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNumber, IsArray, IsNotEmpty, Min, Max } from '@nestjs/class-validator';
 
 export class GetBoardsDto {
   @IsNumber()
@@ -12,7 +11,7 @@ export class GetBoardsDto {
   ticks: number;
 
   @IsNumber()
-  @Min(0)
+  @Min(1)
   last_tick: number;
 }
 
