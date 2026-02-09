@@ -1,60 +1,61 @@
-
 services:
-
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       target: ${NODE_ENV}
-    image: simple_blog_frontend:${NODE_ENV}
+    image: gameoflife_frontend:${NODE_ENV}
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - "8080:8080"
     environment:
       - NODE_ENV=${NODE_ENV}
       - API_URL=${API_URL}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
-      - backend  
+      - backend
+    networks:
+      - gameoflife-network
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
       target: ${NODE_ENV}
-    image: simple_blog_backend:${NODE_ENV} 
+    image: gameoflife_backend:${NODE_ENV}
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "3000:3000"
     environment:
       - NODE_ENV=${NODE_ENV}
       - FRONTEND_URL=${FRONTEND_URL}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_MAIL_SENDER=${AWS_MAIL_SENDER}
-      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     volumes:
       - ./backend:/app
-      - /app/node_modules  
+      - /app/node_modules
     depends_on:
       - db
+    networks:
+      - gameoflife-network
 
   db:
-    image: postgres
+    image: postgres:15-alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data 
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - gameoflife-network
+
 networks:
-  default:
-    driver: bridge  
+  gameoflife-network:
+    driver: bridge
+
 volumes:
   postgres-data:
-    

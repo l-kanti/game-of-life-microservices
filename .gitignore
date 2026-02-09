@@ -8,3 +8,7 @@
 !.vscode/extensions.json
 !.vscode/mcp.json
 .history/*
+node_modules/
+dist/
+.env
+node_modules

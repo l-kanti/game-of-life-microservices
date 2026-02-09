@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/microservices": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/mapped-types": "*",
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.10",
+    "class-validator": "^0.14.0"
+  },
+  "name": "gol",
+  "version": "1.0.0",
+  "description": "description",
+  "homepage": "https://github.com/l-kanti/game-of-life-microservices#readme",
+  "bugs": {
+    "url": "https://github.com/l-kanti/game-of-life-microservices/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/l-kanti/game-of-life-microservices.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start:request": "nest start board-request",
+    "start:compute": "nest start board-compute",
+    "start:dev:request": "nest start board-request --watch",
+    "start:dev:compute": "nest start board-compute --watch",
+    "build": "nest build",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm -- migration:generate -n",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert"
+  }
+}
